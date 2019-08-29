@@ -96,7 +96,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 // when we successfully logout, redirect the browser to /login?logout (since we have not specified otherwise)
                 // we are in charge of rendering a logout confirmation page when /login?logout is requested
                 .loginPage("/login")
-                .defaultSuccessUrl("/", true)
+                .defaultSuccessUrl("/", false)
 
                 // we need to instruct Spring Security to allow anyone to access the /login URL
                 .permitAll()
@@ -108,7 +108,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .tokenRepository(persistentTokenRepository())
                 .tokenValiditySeconds(3600 * 24)
                 .userDetailsService(userService)
-        
+                
                 .and()
 
                 // logout().permitAll() allows any user to request logout and view logout success URL.

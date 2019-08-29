@@ -8,6 +8,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
 import com.google.code.kaptcha.Constants;
+import com.ibm.fsd.um.common.UserManagementConstants;
 
 public class KaptchaAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private static final Logger logger = LoggerFactory.getLogger(KaptchaAuthenticationFilter.class);
@@ -36,10 +38,10 @@ public class KaptchaAuthenticationFilter extends AbstractAuthenticationProcessin
             throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
+        String url = req.getServletPath();
+        logger.debug("kaptch filter: {} {}", req.getMethod(), url);
         
-        logger.debug("kaptch filter: {} {}", req.getMethod(), req.getServletPath());
-        
-        if ("POST".equalsIgnoreCase(req.getMethod()) && servletPath.equals(req.getServletPath())) {
+        if ("POST".equalsIgnoreCase(req.getMethod()) && servletPath.equals(url)) {
             String expect = (String) req.getSession().getAttribute(Constants.KAPTCHA_SESSION_KEY);
             if (expect != null && !expect.equalsIgnoreCase(req.getParameter("kaptcha"))) {
                 unsuccessfulAuthentication(req, res, new InsufficientAuthenticationException("Incorrect captcha code."));

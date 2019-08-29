@@ -14,6 +14,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ibm.fsd.um.common.UserManagementConstants;
 import com.ibm.fsd.um.entity.User;
 import com.ibm.fsd.um.exception.CustomException;
 import com.ibm.fsd.um.response.HttpResponse;
@@ -48,12 +50,21 @@ public class AuthController extends BaseController {
 
         AuthenticationException ex = (AuthenticationException) session
                 .getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
-        String referrer = request.getHeader("Referer");
-        logger.info("referrer of login page is {}", referrer);
         String errorMessage = (error != null && ex != null) ? ex.getMessage() : null;
         if (logout != null) {
         	errorMessage = "You have been successfully logged out !!";
         }
+        
+
+        DefaultSavedRequest preReq = (DefaultSavedRequest)session.getAttribute(UserManagementConstants.SPRING_SECURITY_SAVED_REQUEST);
+        if(preReq != null) {
+        	logger.info("preReq.getServletPath:{}", preReq.getServletPath());
+    		if(UserManagementConstants.URL_USER_ACCOUNT.equals(preReq.getServletPath())) {
+    			errorMessage = "Please login to update your account!!";
+    		}
+        }
+
+        
         model.addAttribute("errorMessage", errorMessage);
         return "login";
     }
